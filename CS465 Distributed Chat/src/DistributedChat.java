@@ -100,18 +100,17 @@ public class DistributedChat extends Frame implements Runnable {
         
         else
         {
-           if(ke.getKeyChar() == KeyEvent.VK_BACK_SPACE)
+           if(ke.getKeyChar() == KeyEvent.VK_BACK_SPACE && outMessage.length() > 0)
            {
               outMessage.deleteCharAt(outMessage.length() - 1);
            }
+           
+           else if(ke.getKeyChar() == KeyEvent.VK_BACK_SPACE && outMessage.length() == 0) {}
            
            else
            {
               outMessage.append(ke.getKeyChar());
            }
-           
-           //System.out.println(outMessage);
-           
         }
         
     }
