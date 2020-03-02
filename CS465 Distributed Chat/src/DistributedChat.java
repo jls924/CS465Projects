@@ -20,7 +20,7 @@ public class DistributedChat extends Frame implements Runnable {
     private boolean run = true;
     // name
     String name;
-
+	PrintWriter pw;
     public DistributedChat() 
     {
         // create field objects
@@ -61,12 +61,44 @@ public class DistributedChat extends Frame implements Runnable {
     }
 
     // method called by key listener
-    public void keyTyped(KeyEvent ke) 
+    public void keyPressed(KeyEvent ke) 
     {
         int i;
         String msg;
         
-        if(ke.getKeyChar() != KeyEvent.VK_ENTER)
+        if(ke.getKeyCode() == KeyEvent.VK_ENTER)
+        {
+			//System.out.println("ENTER pressed");
+			synchronized (sockets) 
+			{
+				// iterate through all sockets, and flush character through
+				for (i = 0; i < sockets.size(); i++) 
+				{
+					try 
+					{
+						Socket s = sockets.get(i);
+						pw = new PrintWriter(s.getOutputStream());
+						pw.write(name + ": " + outMessage.toString() + '\n');
+						pw.flush();
+						textArea.append(name + ": " + outMessage + "\n");
+						outMessage.delete(0, outMessage.length());
+					} 
+
+					catch (IOException ex) 
+					{
+						// remove socket, continue to any next if exception occurs
+						// (socket closed)
+						ex.printStackTrace();
+						sockets.remove(i);
+						continue;
+					}
+                   
+
+				}
+           }
+        }
+        
+        else
         {
            if(ke.getKeyChar() == KeyEvent.VK_BACK_SPACE)
            {
@@ -78,38 +110,8 @@ public class DistributedChat extends Frame implements Runnable {
               outMessage.append(ke.getKeyChar());
            }
            
-           System.out.println(outMessage);
-           textArea.setText(name + ": " + outMessage + "|");
-        }
-        
-        else
-        {
-           synchronized (sockets) 
-           {
-               // iterate through all sockets, and flush character through
-               for (i = 0; i < sockets.size(); i++) 
-               {
-                   try 
-                   {
-                       Socket s = sockets.get(i);
-                       PrintWriter pw = new PrintWriter(s.getOutputStream());
-                       pw.println(name + ": " + outMessage.toString() + '\n');
-                       pw.flush();
-                   } 
-
-                   catch (IOException ex) 
-                   {
-                       // remove socket, continue to any next if exception occurs
-                       // (socket closed)
-                       ex.printStackTrace();
-                       sockets.remove(i);
-                       continue;
-                   }
-                   
-
-               }
-               outMessage.delete(0, outMessage.length());
-           }
+           //System.out.println(outMessage);
+           
         }
         
     }
