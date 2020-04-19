@@ -81,9 +81,9 @@ public class FibonacciClient extends Thread{
 
     public static void main(String[] args) {
         
-        for(int iter = 42; iter > 0; iter--)
+        for(int iter = Integer.parseInt(args[1]); iter > 0; iter--)
         {
-            (new FibonacciClient("/config/Server.properties", iter)).start();
+            (new FibonacciClient(args[0], iter)).start();
         }
     }  
     
